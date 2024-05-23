@@ -11,12 +11,12 @@ public class OrleansTemplateTest
 {
     private const string TemplateName = "orleans";
     private const string SolutionFileName = "OrleansTemplate.sln";
-    private static readonly string[] DefaultArguments = new string[]
-    {
+    private static readonly string[] DefaultArguments =
+    [
         "no-install-azurite-emulator=true",
         "no-start-azurite-emulator=true",
         "http-port={HTTP_PORT}",
-    };
+    ];
 
     public OrleansTemplateTest(ITestOutputHelper testOutputHelper)
     {
@@ -34,14 +34,14 @@ public class OrleansTemplateTest
     [InlineData("OrleansDockerHub", "docker-registry=DockerHub")]
     public async Task RestoreBuild_OrleansDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, DefaultArguments.ToArguments(arguments))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
         }
     }
 
@@ -52,14 +52,14 @@ public class OrleansTemplateTest
     [InlineData("OrleansNoDocker", "docker=false")]
     public async Task Cake_ApiDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, DefaultArguments.ToArguments(arguments))
-                .ConfigureAwait(false);
-            await project.DotnetToolRestoreAsync().ConfigureAwait(false);
-            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+;
+            await project.DotnetToolRestoreAsync();
+            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10));
         }
     }
 

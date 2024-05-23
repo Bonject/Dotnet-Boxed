@@ -14,12 +14,12 @@ public class GraphQLTemplateTest
 {
     private const string TemplateName = "graphql";
     private const string SolutionFileName = "GraphQLTemplate.sln";
-    private static readonly string[] DefaultArguments = new string[]
-    {
+    private static readonly string[] DefaultArguments =
+    [
         "no-open-todo=true",
         "https-port={HTTPS_PORT}",
         "http-port={HTTP_PORT}",
-    };
+    ];
 
     public GraphQLTemplateTest(ITestOutputHelper testOutputHelper)
     {
@@ -53,15 +53,15 @@ public class GraphQLTemplateTest
     [InlineData("GraphQLCacheInMemory", "distributed-cache=InMemory")]
     public async Task RestoreBuildTest_GraphQLDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, DefaultArguments.ToArguments(arguments))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
         }
     }
 
@@ -71,14 +71,14 @@ public class GraphQLTemplateTest
     [InlineData("GraphQLTDefaults")]
     public async Task Cake_GraphQLDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, DefaultArguments.ToArguments(arguments))
-                .ConfigureAwait(false);
-            await project.DotnetToolRestoreAsync().ConfigureAwait(false);
-            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+;
+            await project.DotnetToolRestoreAsync();
+            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10));
         }
     }
 
@@ -87,15 +87,15 @@ public class GraphQLTemplateTest
     [Trait("IsUsingDotnetRun", "true")]
     public async Task RestoreBuildTestRun_GraphQLDefaults_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, "GraphQLTDefaults", DefaultArguments.ToArguments())
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
             await project
                 .DotnetRunAsync(
                     Path.Join("Source", "GraphQLTDefaults"),
@@ -104,40 +104,40 @@ public class GraphQLTemplateTest
                     {
                         var httpResponse = await httpClient
                             .GetAsync(new Uri("/", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
 
                         var httpsResponse = await httpClient
                             .GetAsync(new Uri("/", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
 
                         var statusResponse = await httpClient
                             .GetAsync(new Uri("status", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, statusResponse.StatusCode);
 
                         var statusSelfResponse = await httpClient
                             .GetAsync(new Uri("status/self", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, statusSelfResponse.StatusCode);
 
                         var robotsTxtResponse = await httpClient
                             .GetAsync(new Uri("robots.txt", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, robotsTxtResponse.StatusCode);
 
                         var securityTxtResponse = await httpClient
                             .GetAsync(new Uri(".well-known/security.txt", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, securityTxtResponse.StatusCode);
 
                         var humansTxtResponse = await httpClient
                             .GetAsync(new Uri("humans.txt", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, humansTxtResponse.StatusCode);
                     })
-                .ConfigureAwait(false);
+;
         }
     }
 
@@ -146,18 +146,18 @@ public class GraphQLTemplateTest
     [Trait("IsUsingDotnetRun", "true")]
     public async Task RestoreBuildTestRun_HealthCheckFalse_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "GraphQLTHealthCheckFalse",
-                    DefaultArguments.ToArguments(new string[] { "health-check=false" }))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+                    DefaultArguments.ToArguments(["health-check=false"]))
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
             await project
                 .DotnetRunAsync(
                     Path.Join("Source", "GraphQLTHealthCheckFalse"),
@@ -166,15 +166,15 @@ public class GraphQLTemplateTest
                     {
                         var statusResponse = await httpClient
                             .GetAsync(new Uri("status", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.NotFound, statusResponse.StatusCode);
 
                         var statusSelfResponse = await httpClient
                             .GetAsync(new Uri("status/self", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.NotFound, statusSelfResponse.StatusCode);
                     })
-                .ConfigureAwait(false);
+;
         }
     }
 
@@ -183,18 +183,18 @@ public class GraphQLTemplateTest
     [Trait("IsUsingDotnetRun", "true")]
     public async Task RestoreBuildTestRun_HttpsEverywhereTrue_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "GraphQLTHttpsEverywhereTrue",
-                    DefaultArguments.ToArguments(new string[] { "https-everywhere=true" }))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+                    DefaultArguments.ToArguments(["https-everywhere=true"]))
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
             await project
                 .DotnetRunAsync(
                     Path.Join("Source", "GraphQLTHttpsEverywhereTrue"),
@@ -203,10 +203,10 @@ public class GraphQLTemplateTest
                     {
                         var httpResponse = await httpsClient
                             .GetAsync(new Uri("/", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                     })
-                .ConfigureAwait(false);
+;
 
             var files = new DirectoryInfo(project.DirectoryPath).GetFiles("*.*", SearchOption.AllDirectories);
 
@@ -221,27 +221,27 @@ public class GraphQLTemplateTest
     [Trait("IsUsingDotnetRun", "false")]
     public async Task RestoreBuildTestCake_DockerFalse_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "GraphQLDockerFalse",
-                    DefaultArguments.ToArguments(new string[] { "docker=false" }))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
-            await project.DotnetToolRestoreAsync().ConfigureAwait(false);
-            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+                    DefaultArguments.ToArguments(["docker=false"]))
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
+            await project.DotnetToolRestoreAsync();
+            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10));
 
             var files = new DirectoryInfo(project.DirectoryPath).GetFiles("*.*", SearchOption.AllDirectories);
 
             Assert.DoesNotContain(files, x => x.Name == ".dockerignore");
             Assert.DoesNotContain(files, x => x.Name == "Dockerfile");
 
-            var cake = await File.ReadAllTextAsync(files.Single(x => x.Name == "build.cake").FullName).ConfigureAwait(false);
+            var cake = await File.ReadAllTextAsync(files.Single(x => x.Name == "build.cake").FullName);
 
             Assert.DoesNotContain(cake, "Docker", StringComparison.Ordinal);
         }

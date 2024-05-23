@@ -13,6 +13,7 @@ public class NuGetTemplateTest
 {
     private const string TemplateName = "nuget";
     private const string SolutionFileName = "NuGetTemplate.sln";
+    private static readonly string[] Arguments = ["sign=false"];
 
     public NuGetTemplateTest(ITestOutputHelper testOutputHelper)
     {
@@ -35,20 +36,20 @@ public class NuGetTemplateTest
     [InlineData("NuGetNoComments", "comments=false")]
     public async Task RestoreBuildTest_NuGetDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, arguments.ToArguments())
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
 
             if (!arguments.Contains("framework=net472") ||
                 (arguments.Contains("framework=net472") && Environment.OSVersion.Platform == PlatformID.Win32NT))
             {
                 // There seems to be a bug that stops xUnit working on Mono.
-                await project.DotnetTestAsync().ConfigureAwait(false);
+                await project.DotnetTestAsync();
             }
         }
     }
@@ -59,14 +60,14 @@ public class NuGetTemplateTest
     [InlineData("NuGetDefaults")]
     public async Task Cake_NuGetDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, arguments.ToArguments())
-                .ConfigureAwait(false);
-            await project.DotnetToolRestoreAsync().ConfigureAwait(false);
-            await project.DotnetCakeAsync().ConfigureAwait(false);
+;
+            await project.DotnetToolRestoreAsync();
+            await project.DotnetCakeAsync();
         }
     }
 
@@ -82,20 +83,20 @@ public class NuGetTemplateTest
         string cakeContent,
         params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, arguments.ToArguments())
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
-            await project.DotnetToolRestoreAsync().ConfigureAwait(false);
-            await project.DotnetCakeAsync().ConfigureAwait(false);
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
+            await project.DotnetToolRestoreAsync();
+            await project.DotnetCakeAsync();
 
             Assert.False(File.Exists(Path.Combine(project.DirectoryPath, relativeFilePath)));
-            var cake = await File.ReadAllTextAsync(Path.Combine(project.DirectoryPath, "build.cake")).ConfigureAwait(false);
+            var cake = await File.ReadAllTextAsync(Path.Combine(project.DirectoryPath, "build.cake"));
             Assert.DoesNotContain(cakeContent, cake, StringComparison.Ordinal);
         }
     }
@@ -105,18 +106,18 @@ public class NuGetTemplateTest
     [Trait("IsUsingDotnetRun", "false")]
     public async Task RestoreBuildTest_SignFalse_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "NuGetSignFalse",
-                    new string[] { "sign=false" }.ToArguments())
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+                    Arguments.ToArguments())
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
 
             var files = new DirectoryInfo(project.DirectoryPath).GetFiles("*.*", SearchOption.AllDirectories);
 

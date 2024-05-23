@@ -18,12 +18,12 @@ public class ApiTemplateTest
 {
     private const string TemplateName = "api";
     private const string SolutionFileName = "ApiTemplate.sln";
-    private static readonly string[] DefaultArguments = new string[]
-    {
+    private static readonly string[] DefaultArguments =
+    [
         "no-open-todo=true",
         "https-port={HTTPS_PORT}",
         "http-port={HTTP_PORT}",
-    };
+    ];
 
     public ApiTemplateTest(ITestOutputHelper testOutputHelper)
     {
@@ -56,15 +56,15 @@ public class ApiTemplateTest
     [InlineData("ApiXmlSerializer", "xml-formatter=XmlSerializer")]
     public async Task RestoreBuildTest_ApiDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, DefaultArguments.ToArguments(arguments))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
         }
     }
 
@@ -74,14 +74,14 @@ public class ApiTemplateTest
     [InlineData("ApiDefaults")]
     public async Task Cake_ApiDefaults_SuccessfulAsync(string name, params string[] arguments)
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, name, DefaultArguments.ToArguments(arguments))
-                .ConfigureAwait(false);
-            await project.DotnetToolRestoreAsync().ConfigureAwait(false);
-            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+;
+            await project.DotnetToolRestoreAsync();
+            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10));
         }
     }
 
@@ -90,15 +90,15 @@ public class ApiTemplateTest
     [Trait("IsUsingDotnetRun", "true")]
     public async Task RestoreBuildTestRun_ApiDefaults_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(TemplateName, "ApiDefaults", DefaultArguments.ToArguments())
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
             await project
                 .DotnetRunAsync(
                     Path.Join("Source", "ApiDefaults"),
@@ -107,30 +107,30 @@ public class ApiTemplateTest
                     {
                         var httpResponse = await httpClient
                             .GetAsync(new Uri("status", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
 
                         var statusResponse = await httpClient
                             .GetAsync(new Uri("status", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, statusResponse.StatusCode);
                         Assert.Equal(ContentType.Text, statusResponse.Content.Headers.ContentType?.MediaType);
 
                         var statusSelfResponse = await httpClient
                             .GetAsync(new Uri("status/self", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, statusSelfResponse.StatusCode);
                         Assert.Equal(ContentType.Text, statusSelfResponse.Content.Headers.ContentType?.MediaType);
 
                         var carsResponse = await httpClient
                             .GetAsync(new Uri("cars", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, carsResponse.StatusCode);
                         Assert.Equal(ContentType.RestfulJson, carsResponse.Content.Headers.ContentType?.MediaType);
 
                         var postCarResponse = await httpClient
                             .PostAsJsonAsync(new Uri("cars", UriKind.Relative), new SaveCar())
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.BadRequest, postCarResponse.StatusCode);
                         Assert.Equal(ContentType.ProblemJson, postCarResponse.Content.Headers.ContentType?.MediaType);
 
@@ -140,35 +140,35 @@ public class ApiTemplateTest
                         notAcceptableCarsRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(ContentType.Text));
                         var notAcceptableCarsResponse = await httpClient
                             .SendAsync(notAcceptableCarsRequest)
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.NotAcceptable, notAcceptableCarsResponse.StatusCode);
 
                         var swaggerJsonResponse = await httpClient
                             .GetAsync(new Uri("swagger/v1/swagger.json", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, swaggerJsonResponse.StatusCode);
                         Assert.Equal(ContentType.Json, swaggerJsonResponse.Content.Headers.ContentType?.MediaType);
 
                         var robotsTxtResponse = await httpClient
                             .GetAsync(new Uri("robots.txt", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, robotsTxtResponse.StatusCode);
                         Assert.Equal(ContentType.Text, robotsTxtResponse.Content.Headers.ContentType?.MediaType);
 
                         var securityTxtResponse = await httpClient
                             .GetAsync(new Uri(".well-known/security.txt", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, securityTxtResponse.StatusCode);
                         Assert.Equal(ContentType.Text, securityTxtResponse.Content.Headers.ContentType?.MediaType);
 
                         var humansTxtResponse = await httpClient
                             .GetAsync(new Uri("humans.txt", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, humansTxtResponse.StatusCode);
                         Assert.Equal(ContentType.Text, humansTxtResponse.Content.Headers.ContentType?.MediaType);
                     },
                     timeout: TimeSpan.FromMinutes(2))
-                .ConfigureAwait(false);
+;
         }
     }
 
@@ -177,18 +177,18 @@ public class ApiTemplateTest
     [Trait("IsUsingDotnetRun", "true")]
     public async Task RestoreBuildTestRun_HealthCheckFalse_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "ApiHealthCheckFalse",
-                    DefaultArguments.ToArguments(new string[] { "health-check=false" }))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+                    DefaultArguments.ToArguments(["health-check=false"]))
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
             await project
                 .DotnetRunAsync(
                     Path.Join("Source", "ApiHealthCheckFalse"),
@@ -197,15 +197,15 @@ public class ApiTemplateTest
                     {
                         var statusResponse = await httpClient
                             .GetAsync(new Uri("status", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.NotFound, statusResponse.StatusCode);
 
                         var statusSelfResponse = await httpClient
                             .GetAsync(new Uri("status/self", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.NotFound, statusSelfResponse.StatusCode);
                     })
-                .ConfigureAwait(false);
+;
         }
     }
 
@@ -214,18 +214,18 @@ public class ApiTemplateTest
     [Trait("IsUsingDotnetRun", "true")]
     public async Task RestoreBuildTestRun_HttpsEverywhereTrue_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "ApiHttpsEverywhereTrue",
-                    DefaultArguments.ToArguments(new string[] { "https-everywhere=true" }))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+                    DefaultArguments.ToArguments(["https-everywhere=true"]))
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
             await project
                 .DotnetRunAsync(
                     Path.Join("Source", "ApiHttpsEverywhereTrue"),
@@ -234,10 +234,10 @@ public class ApiTemplateTest
                     {
                         var statusResponse = await httpsClient
                             .GetAsync(new Uri("status", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.OK, statusResponse.StatusCode);
                     })
-                .ConfigureAwait(false);
+;
 
             var files = new DirectoryInfo(project.DirectoryPath).GetFiles("*.*", SearchOption.AllDirectories);
 
@@ -252,18 +252,18 @@ public class ApiTemplateTest
     [Trait("IsUsingDotnetRun", "true")]
     public async Task RestoreBuildTestRun_SwaggerFalse_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "ApiSwaggerFalse",
-                    DefaultArguments.ToArguments(new string[] { "swagger=false" }))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
+                    DefaultArguments.ToArguments(["swagger=false"]))
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
             await project
                 .DotnetRunAsync(
                     Path.Join("Source", "ApiSwaggerFalse"),
@@ -272,10 +272,10 @@ public class ApiTemplateTest
                     {
                         var swaggerJsonResponse = await httpClient
                             .GetAsync(new Uri("swagger/v1/swagger.json", UriKind.Relative))
-                            .ConfigureAwait(false);
+;
                         Assert.Equal(HttpStatusCode.NotFound, swaggerJsonResponse.StatusCode);
                     })
-                .ConfigureAwait(false);
+;
         }
     }
 
@@ -284,27 +284,27 @@ public class ApiTemplateTest
     [Trait("IsUsingDotnetRun", "false")]
     public async Task RestoreBuildTestRun_DockerFalse_SuccessfulAsync()
     {
-        await InstallTemplateAsync().ConfigureAwait(false);
+        await InstallTemplateAsync();
         await using (var tempDirectory = TempDirectory.NewTempDirectory())
         {
             var project = await tempDirectory
                 .DotnetNewAsync(
                     TemplateName,
                     "ApiDockerFalse",
-                    DefaultArguments.ToArguments(new string[] { "docker=false" }))
-                .ConfigureAwait(false);
-            await project.DotnetRestoreWithRetryAsync().ConfigureAwait(false);
-            await project.DotnetBuildAsync().ConfigureAwait(false);
-            await project.DotnetTestAsync().ConfigureAwait(false);
-            await project.DotnetToolRestoreAsync().ConfigureAwait(false);
-            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10)).ConfigureAwait(false);
+                    DefaultArguments.ToArguments(["docker=false"]))
+;
+            await project.DotnetRestoreWithRetryAsync();
+            await project.DotnetBuildAsync();
+            await project.DotnetTestAsync();
+            await project.DotnetToolRestoreAsync();
+            await project.DotnetCakeAsync(timeout: TimeSpan.FromMinutes(10));
 
             var files = new DirectoryInfo(project.DirectoryPath).GetFiles("*.*", SearchOption.AllDirectories);
 
             Assert.DoesNotContain(files, x => x.Name == ".dockerignore");
             Assert.DoesNotContain(files, x => x.Name == "Dockerfile");
 
-            var cake = await File.ReadAllTextAsync(files.Single(x => x.Name == "build.cake").FullName).ConfigureAwait(false);
+            var cake = await File.ReadAllTextAsync(files.Single(x => x.Name == "build.cake").FullName);
 
             Assert.DoesNotContain(cake, "Docker", StringComparison.Ordinal);
         }
